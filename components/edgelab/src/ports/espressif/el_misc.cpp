@@ -50,6 +50,6 @@ EL_ATTR_WEAK void* el_calloc(size_t nmemb, size_t size) { return calloc(nmemb, s
 
 EL_ATTR_WEAK void el_free(void* ptr) { free(ptr); }
 
-EL_ATTR_WEAK void el_reset(void) { exit(0); }
+EL_ATTR_WEAK void el_reset(void) { esp_restart(); }
 
 }  // namespace edgelab

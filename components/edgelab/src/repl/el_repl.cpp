@@ -333,11 +333,11 @@ EL_STA ReplServer::_exec_cmd(std::string& cmd) {
     for (auto& repl_cmd : _cmd_list) {
         if (repl_cmd.cmd == cmd_name) {
             if (cmd_type == EL_REPL_CMD_READ && repl_cmd.read_cb) {
-                ret = repl_cmd.read_cb();
+                ret = repl_cmd.read_cb(argc, argv);
             } else if (cmd_type == EL_REPL_CMD_WRITE && repl_cmd.write_cb) {
                 ret = repl_cmd.write_cb(argc, argv);
             } else if (cmd_type == EL_REPL_CMD_EXEC && repl_cmd.exec_cb) {
-                ret = repl_cmd.exec_cb();
+                ret = repl_cmd.exec_cb(argc, argv);
             }
             if (ret != EL_OK) {
                 el_printf("Command %s failed.\n", cmd_name.c_str());

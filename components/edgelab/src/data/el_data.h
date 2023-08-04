@@ -35,12 +35,12 @@
 namespace edgelab {
 
 using ModelLoader   = data::ModelLoader;
-using PersistentMap = data::PersistentMap;
+// using PersistentMap = data::PersistentMap;
 
 }  // namespace edgelab
 
 // TODO: avoid expose the namespace to global
-using namespace edgelab::data::traits;
+// using namespace edgelab::data::traits;
 using namespace edgelab::data::types;
 using namespace edgelab::data::utility;
 

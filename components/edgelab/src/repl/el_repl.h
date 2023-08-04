@@ -39,8 +39,8 @@
 
 namespace edgelab {
 
-typedef std::function<EL_STA(void)>        el_repl_cmd_exec_cb_t;
-typedef std::function<EL_STA(void)>        el_repl_cmd_read_cb_t;
+typedef std::function<EL_STA(int, char**)> el_repl_cmd_exec_cb_t;
+typedef std::function<EL_STA(int, char**)> el_repl_cmd_read_cb_t;
 typedef std::function<EL_STA(int, char**)> el_repl_cmd_write_cb_t;
 
 typedef enum {

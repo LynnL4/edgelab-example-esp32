@@ -1,1 +1,1 @@
-idf_component_register(SRCS app_main.cpp)
+idf_component_register(SRCS app_main.cpp at_handlers.cpp person_panda.cpp)
