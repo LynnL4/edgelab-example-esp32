@@ -356,7 +356,6 @@ void ReplServer::init() {
 
     el_printf("Welcome to EegeLab REPL.\n");
     el_printf("Type 'AT+HELP' for command list.\n");
-    el_printf("> ");
 }
 
 }  // namespace edgelab
