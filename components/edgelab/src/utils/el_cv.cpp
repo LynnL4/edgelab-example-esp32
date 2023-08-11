@@ -143,18 +143,18 @@ EL_ATTR_WEAK EL_STA rgb_to_rgb(const el_img_t* src, el_img_t* dst) {
             //     break;
             // }
 
-            // if (dst->format == EL_PIXEL_FORMAT_GRAYSCALE) {
-            //     // rgb to gray
-            //     uint8_t gray     = (r * 299 + g * 587 + b * 114) / 1000;
-            //     dst->data[index] = gray;
-            // } else if (dst->format == EL_PIXEL_FORMAT_RGB565) {
-            //     dst->data[index * 2 + 0] = (r & 0xF8) | (g >> 5);
-            //     dst->data[index * 2 + 1] = ((g << 3) & 0xE0) | (b >> 3);
-            // } else if (dst->format == EL_PIXEL_FORMAT_RGB888) {
-            dst->data[index * 3 + 0] = r;
-            dst->data[index * 3 + 1] = g;
-            dst->data[index * 3 + 2] = b;
-            // }
+            if (dst->format == EL_PIXEL_FORMAT_GRAYSCALE) {
+                // rgb to gray
+                uint8_t gray     = (r * 299 + g * 587 + b * 114) / 1000;
+                dst->data[index] = gray;
+            } else if (dst->format == EL_PIXEL_FORMAT_RGB565) {
+                dst->data[index * 2 + 0] = (r & 0xF8) | (g >> 5);
+                dst->data[index * 2 + 1] = ((g << 3) & 0xE0) | (b >> 3);
+            } else if (dst->format == EL_PIXEL_FORMAT_RGB888) {
+                dst->data[index * 3 + 0] = r;
+                dst->data[index * 3 + 1] = g;
+                dst->data[index * 3 + 2] = b;
+            }
         }
     }
 

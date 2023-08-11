@@ -437,3 +437,68 @@ int algo_yolo_get_preview(YOLO* algo, char* preview, uint16_t max_length)
 
     return 0;
 }
+
+
+int algo_fomo_get_preview(FOMO* algo, char* preview, uint16_t max_length)
+{
+    memset(preview, 0, max_length);
+    auto _object_detection_list = algo->get_results();
+    uint16_t index = 0;
+    // 获取目前结果集长度
+    uint16_t size = std::distance(_object_detection_list.begin(), _object_detection_list.end());
+
+    if (size == 0) {
+        return 1;
+    }
+
+    // 输入preview最多能有多少element
+    uint16_t available_size = (max_length - sizeof(IMAGE_PREVIEW_FORMATE)) /
+                              (IMAGE_PREIVEW_ELEMENT_SIZE * IMAGE_PREIVEW_ELEMENT_NUM);
+
+    if (available_size < 1) {
+        return 1;
+    }
+
+    std::string element[IMAGE_PREIVEW_ELEMENT_NUM];
+
+    // 生成element
+    for (auto it = _object_detection_list.begin(); it != _object_detection_list.end(); ++it) {
+        if (index == 0) {
+            element[0] = std::to_string(it->x);
+            element[1] = std::to_string(it->y);
+            element[2] = std::to_string(it->w);
+            element[3] = std::to_string(it->h);
+            element[4] = std::to_string(it->target);
+            element[5] = std::to_string(it->score);
+        }
+        else {
+            element[0] = element[0] + "," + std::to_string(it->x);
+            element[1] = element[1] + "," + std::to_string(it->y);
+            element[2] = element[2] + "," + std::to_string(it->w);
+            element[3] = element[3] + "," + std::to_string(it->h);
+            element[4] = element[4] + "," + std::to_string(it->target);
+            element[5] = element[5] + "," + std::to_string(it->score);
+        }
+        index++;
+        // 如果超过最大的可预览长度 则退出
+        if (index > IMG_PREVIEW_MAX_SIZE || index > available_size) {
+            break;
+        }
+    }
+
+    // 规格化preview
+    snprintf(preview,
+             max_length,
+             IMAGE_PREVIEW_FORMATE,
+             at_config.algo,
+             at_config.model,
+             size,
+             element[0].c_str(),
+             element[1].c_str(),
+             element[2].c_str(),
+             element[3].c_str(),
+             element[4].c_str(),
+             element[5].c_str());
+
+    return 0;
+}

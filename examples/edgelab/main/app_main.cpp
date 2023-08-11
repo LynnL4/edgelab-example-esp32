@@ -15,21 +15,28 @@ void task_invoke(void* arg)
     auto* device = Device::get_device();
     auto* camera = device->get_camera();
     camera->init(240, 240);
-
     auto* engine = new InferenceEngine<EngineName::TFLite>();
-
     static auto* tensor_arena{heap_caps_malloc(1024 * 1024, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT)};
     memset(tensor_arena, 0, 1024 * 1024);
     auto ret = engine->init(tensor_arena, 1024 * 1024);
-
     auto model = algo_get_model_index(at_config.model);
     if (engine->load_model((const void*)model, 1024 * 1024) != EL_OK) {
         printf("load model failed");
         return;
     }
+    static auto* yolo = new YOLO(engine, at_config.confidence, at_config.iou);
+    static auto* fomo = new FOMO(engine, at_config.confidence);
+    auto output_shape = engine->get_output_shape(0);
+    if (output_shape.size == 3 || output_shape.size == 4) {
+        at_config.state = 0;
+    }
+    else {
+        at_config.state = 7;
+    }
 
-    el_shape_t output_shape = engine->get_output_shape(0);
-    static auto* algo = new YOLO(engine);
+    uint32_t preprocess_time = 0;
+    uint32_t run_time = 0;
+    uint32_t postprocess_time = 0;
 
     while (1) {
         vTaskDelay(10 / portTICK_PERIOD_MS);
@@ -38,10 +45,22 @@ void task_invoke(void* arg)
             el_img_t img;
             camera->start_stream();
             camera->get_frame(&img);
-            algo->run(&img);
-            uint32_t preprocess_time = algo->get_preprocess_time();
-            uint32_t run_time = algo->get_run_time();
-            uint32_t postprocess_time = algo->get_postprocess_time();
+            if (output_shape.size == 3) {
+                yolo->run(&img);
+                algo_yolo_get_preview(yolo, result, sizeof(result));
+                preprocess_time = yolo->get_preprocess_time();
+                run_time = yolo->get_run_time();
+                postprocess_time = yolo->get_postprocess_time();
+            }
+            else if (output_shape.size == 4) {
+                fomo->run(&img);
+                algo_fomo_get_preview(fomo, result, sizeof(result));
+                preprocess_time = fomo->get_preprocess_time();
+                run_time = fomo->get_run_time();
+            }
+            else {
+                memset(result, 0, sizeof(result));
+            }
             auto* current_img = &img;
             auto size{current_img->width * current_img->height * 3};
             auto rgb_img{el_img_t{.data = new uint8_t[size]{},
@@ -75,7 +94,6 @@ void task_invoke(void* arg)
                     delete[] buffer;
                 }
                 vTaskDelay(10 / portTICK_PERIOD_MS);
-                algo_yolo_get_preview(algo, result, sizeof(result));
                 if (strlen(result) > 0)
                     printf("%s", result);
             }

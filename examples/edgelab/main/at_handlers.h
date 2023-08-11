@@ -109,4 +109,5 @@ extern at_config_t at_config;
 EL_STA at_handler_init(void);
 extern uint32_t algo_get_model_index(uint8_t model_index);
 int algo_yolo_get_preview(YOLO* algo, char* preview, uint16_t max_length);
+int algo_fomo_get_preview(FOMO* algo, char* preview, uint16_t max_length);
 #endif /* AT_HANDLERS_H_ */
